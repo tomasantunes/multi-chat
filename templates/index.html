@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  </head>
+  <body>
+    <div id="chatbox">
+      <p class="botText"></p>
+      {% for m in messages %}
+      <p class="userText"><span><b>{{ m[3] }}: </b>{{ m[1] }}</span></p>
+      {% endfor %}
+    </div>
+    <div>
+      <form id="message-form" method="POST">
+        <div id="userInput">
+          <input id="textInput" type="text" name="message" placeholder="Message">
+          <input id="buttonInput" type="button" class="btn btn-primary" value="Send">
+        </div>
+      
+      
+        <div id="nickname">
+          <label for="nickname-select">Nickname</label>
+          <div class="form-group">
+            <select class="form-control form-control-sm" name="author" id="nickname-select">
+                <option>Select Name</option>
+                {% for n in nicknames %}
+                  <option>{{ n[1] }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          
+        </div>
+      </form>
+      <form id="add-name-form" method="POST">
+        <label for="add-name"><b>Add Nickname</b></label>
+        <div id="add-name">
+          <input type="text" id="nickname-input" name="nickname">
+          <button type="button" class="btn btn-primary" id="add">Add</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+      function insertLine() {
+        var rawText = $("#textInput").val();
+        var name = $("#nickname-select").val();
+        var userHtml = '<p class="userText"><span><b>' + name + ': </b>' + rawText + '</span></p>';
+        $("#chatbox").append(userHtml);
+        document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+        $.ajax({
+          url: '/submit-message',
+          data: $('#message-form').serialize(),
+          type: 'POST',
+          success: function(response) {
+            $("#textInput").val("");
+            $("#chatbox").scrollTop($("#chatbox").height());
+          },
+          error: function(error) {
+            console.log(error);
+          }
+        });
+      }
+
+      function insertNickname(name) {
+        $.ajax({
+          url: '/add-nickname',
+          data: $('#add-name-form').serialize(),
+          type: 'POST',
+          success: function(response) {
+            console.log("Success");
+            $("#nickname-input").val("");
+          },
+          error: function(error) {
+            console.log(error);
+          }
+        });
+      }
+      $(document).ready(function() {
+        $("#chatbox").scrollTop($("#chatbox").height());
+      });
+
+      $("#add").on("click", function () {
+        var name = $("#nickname-input").val();
+        $("#nickname-select").append("<option value='" + name + "'>" + name + "</option>");
+        insertNickname(name);
+      });
+      
+      $("#textInput").keypress(function(e) {
+          if(e.which == 13) {
+              insertLine();
+          }
+      });
+      $("#buttonInput").click(function() {
+        insertLine();
+      });
+    </script>
+  </body>
+</html>
