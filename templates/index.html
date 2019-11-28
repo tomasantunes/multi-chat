@@ -8,7 +8,14 @@
     <div id="chatbox">
       <p class="botText"></p>
       {% for m in messages %}
-      <p class="userText"><span><b>{{ m[3] }}: </b>{{ m[1] }}</span></p>
+      <p class="userText">
+        <span>
+          <b>{{ m[3] }}:</b>
+          {{ m[1] }}
+          <button id="edit-btn" class="btn btn-small">Edit</button>
+          <button id="delete-btn" class="btn btn-small">Delete</button>
+        </span>
+      </p>
       {% endfor %}
     </div>
     <div>

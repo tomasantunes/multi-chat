@@ -73,6 +73,20 @@ def submitMessage():
 	insertMessage(message, dt, author)
 	return 'OK'
 
+@app.route("/edit-message", methods=['POST'])
+def submitMessage():
+	id = request.form['id']
+	message = request.form['message']
+	dt = str(datetime.datetime.now())
+	editMessage(id, dt, author, message)
+	return 'OK'
+
+@app.route("/delete-message", methods=['POST'])
+def submitMessage():
+	id = request.form['id']
+	deleteMessage(id, dt, author, message)
+	return 'OK'
+
 @app.route("/add-nickname", methods=['POST'])
 def addNickname():
 	nickname = request.form['nickname']
