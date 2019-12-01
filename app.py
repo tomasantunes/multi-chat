@@ -36,6 +36,28 @@ def insertMessage(newMessage, dt, author):
 	except sqlite3.Error as er:
 		print('er:', er)
 
+def editMessage(id, dt, author, message):
+	try:
+		conn = sqlite3.connect(DATABASE)
+		message = (dt, author, message, id)
+		sql_edit_message = """ UPDATE messages SET date = ?, author = ?, message = ? WHERE id = ? """
+		cur = conn.cursor()
+		cur.execute(sql_edit_message, message)
+		conn.commit()
+	except sqlite3.Error as er:
+		print('er:', er)
+
+def deleteMessage(id):
+	try:
+		conn = sqlite3.connect(DATABASE)
+		message = (id)
+		sql_delete_message = """ DELETE FROM messages WHERE id = ? """
+		cur = conn.cursor()
+		cur.execute(sql_delete_message, message)
+		conn.commit()
+	except sqlite3.Error as er:
+		print('er:', er)
+
 def insertNickname(name):
 	try:
 		conn = sqlite3.connect(DATABASE)
@@ -84,7 +106,7 @@ def submitMessage():
 @app.route("/delete-message", methods=['POST'])
 def submitMessage():
 	id = request.form['id']
-	deleteMessage(id, dt, author, message)
+	deleteMessage(id)
 	return 'OK'
 
 @app.route("/add-nickname", methods=['POST'])
