@@ -5,52 +5,75 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
   </head>
   <body>
-    <div id="chatbox">
-      <p class="botText"></p>
-      {% for m in messages %}
-      <p class="userText">
-        <span>
-          <b>{{ m[3] }}:</b>
-          {{ m[1] }}
-          <button id="edit-btn" class="btn btn-small">Edit</button>
-          <button id="delete-btn" class="btn btn-small">Delete</button>
-        </span>
-      </p>
-      {% endfor %}
-    </div>
-    <div>
-      <form id="message-form" method="POST">
-        <div id="userInput">
-          <input id="textInput" type="text" name="message" placeholder="Message">
-          <input id="buttonInput" type="button" class="btn btn-primary" value="Send">
-        </div>
-      
-      
-        <div id="nickname">
-          <label for="nickname-select">Nickname</label>
-          <div class="form-group">
-            <select class="form-control form-control-sm" name="author" id="nickname-select">
-                <option>Select Name</option>
-                {% for n in nicknames %}
-                  <option>{{ n[1] }}</option>
-                {% endfor %}
-            </select>
+    <div id="app">
+      <div id="chatbox">
+        <p class="botText"></p>
+        {% for m in messages %}
+        <p class="userText">
+          <span>
+            <b>{{ m[3] }}:</b>
+            {{ m[1] }}
+            <button id="edit-btn" class="btn btn-small">Edit</button>
+            <button id="delete-btn" class="btn btn-small">Delete</button>
+          </span>
+        </p>
+        {% endfor %}
+      </div>
+      <div>
+        <form id="message-form" method="POST">
+          <div id="userInput">
+            <input id="textInput" type="text" name="message" placeholder="Message">
+            <input id="buttonInput" type="button" class="btn btn-primary" value="Send">
           </div>
-          
-        </div>
-      </form>
-      <form id="add-name-form" method="POST">
-        <label for="add-name"><b>Add Nickname</b></label>
-        <div id="add-name">
-          <input type="text" id="nickname-input" name="nickname">
-          <button type="button" class="btn btn-primary" id="add">Add</button>
-        </div>
-      </form>
+        
+        
+          <div id="nickname">
+            <label for="nickname-select">Nickname</label>
+            <div class="form-group">
+              <select class="form-control form-control-sm" name="author" id="nickname-select">
+                  <option>Select Name</option>
+                  {% for n in nicknames %}
+                    <option>{{ n[1] }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+            
+          </div>
+        </form>
+        <form id="add-name-form" method="POST">
+          <label for="add-name"><b>Add Nickname</b></label>
+          <div id="add-name">
+            <input type="text" id="nickname-input" name="nickname">
+            <button type="button" class="btn btn-primary" id="add">Add</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/knockout.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script>
+      function AppViewModel() {
+        var self = this;
+
+        self.insertLine = function() {
+
+        }
+
+        self.insertNickname = function() {
+
+        }
+
+        self.init = function() {
+
+        }
+
+        self.init();
+      }
+
+      ko.applyBindings(new AppViewModel(), document.getElementById("app"));
+      
       function insertLine() {
         var rawText = $("#textInput").val();
         var name = $("#nickname-select").val();
