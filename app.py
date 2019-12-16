@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request, g, jsonify
 import sqlite3
 import os
 import datetime
@@ -87,6 +87,20 @@ def home():
 	nicknames = cur.fetchall()
 	return render_template("index.html", messages=messages, nicknames=nicknames)
 
+@app.route("/get-messages")
+def getMessages():
+	cur = get_db().cursor()
+	data = cur.execute("select * from messages")
+	messages = cur.fetchall()
+	return jsonify(messages)
+
+@app.route("/get-nicknames")
+def getNicknames():
+	cur = get_db().cursor()
+	data = cur.execute("select * from nicknames")
+	nicknames = cur.fetchall()
+	return jsonify(nicknames)
+
 @app.route("/submit-message", methods=['POST'])
 def submitMessage():
 	author = request.form['author']
@@ -96,15 +110,16 @@ def submitMessage():
 	return 'OK'
 
 @app.route("/edit-message", methods=['POST'])
-def submitMessage():
+def editMessage2():
 	id = request.form['id']
 	message = request.form['message']
+	author = request.form['author']
 	dt = str(datetime.datetime.now())
 	editMessage(id, dt, author, message)
 	return 'OK'
 
 @app.route("/delete-message", methods=['POST'])
-def submitMessage():
+def deleteMessage2():
 	id = request.form['id']
 	deleteMessage(id)
 	return 'OK'

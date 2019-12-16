@@ -7,44 +7,40 @@
   <body>
     <div id="app">
       <div id="chatbox">
-        <p class="botText"></p>
-        {% for m in messages %}
-        <p class="userText">
-          <span>
-            <b>{{ m[3] }}:</b>
-            {{ m[1] }}
-            <button id="edit-btn" class="btn btn-small">Edit</button>
-            <button id="delete-btn" class="btn btn-small">Delete</button>
-          </span>
-        </p>
-        {% endfor %}
+        <div data-bind="foreach: messages">
+          <p class="userText">
+            <span>
+              <b data-bind="text: author + ': '"></b>
+              <span data-bind="text: message, visible: !editMode()"></span>
+              <input type="text" data-bind="textInput: message, visible: editMode">
+              <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
+              <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
+            </span>
+          </p>
+        </div>
       </div>
       <div>
-        <form id="message-form" method="POST">
+        <form id="message-form" data-bind="submit: insertLine">
           <div id="userInput">
-            <input id="textInput" type="text" name="message" placeholder="Message">
-            <input id="buttonInput" type="button" class="btn btn-primary" value="Send">
+            <input id="textInput" type="text" name="message"  data-bind="textInput: message" placeholder="Message">
+            <input id="buttonInput" type="submit" class="btn btn-primary" value="Send">
           </div>
         
         
           <div id="nickname">
             <label for="nickname-select">Nickname</label>
             <div class="form-group">
-              <select class="form-control form-control-sm" name="author" id="nickname-select">
-                  <option>Select Name</option>
-                  {% for n in nicknames %}
-                    <option>{{ n[1] }}</option>
-                  {% endfor %}
+              <select class="form-control form-control-sm" data-bind="options: nicknames, value: selectedNickname, optionsCaption: 'Select name', optionsText: 'author'" name="author" id="nickname-select">
               </select>
             </div>
             
           </div>
         </form>
-        <form id="add-name-form" method="POST">
+        <form id="add-name-form" data-bind="submit: insertNickname">
           <label for="add-name"><b>Add Nickname</b></label>
           <div id="add-name">
-            <input type="text" id="nickname-input" name="nickname">
-            <button type="button" class="btn btn-primary" id="add">Add</button>
+            <input type="text" id="nickname-input" data-bind="textInput: newNickname" name="nickname">
+            <button type="submit" class="btn btn-primary"  id="add">Add</button>
           </div>
         </form>
       </div>
@@ -56,17 +52,94 @@
     <script>
       function AppViewModel() {
         var self = this;
+        self.message = ko.observable();
+        self.newNickname = ko.observable();
+        self.selectedNickname = ko.observable();
+        self.nicknames = ko.observableArray();
+        self.messages = ko.observableArray();
+        self.showEditMessage = ko.observable(false);
+
+        self.MessageModel = function(m) {
+          var mm = this;
+          mm.message = ko.observable(m.message);
+          mm.author = ko.observable(m.author);
+          mm.editMode = ko.observable(false);
+
+          mm.editMessage = function() {
+            mm.editMode(!mm.editMode());
+          }
+        }
+
+        self.NicknameModel = function(n) {
+          var nm = this;
+          nm.author = n.author;
+        }
 
         self.insertLine = function() {
-
+          var message = {"message": self.message(), "author": self.selectedNickname()}
+          self.messages.push(new self.MessageModel(message));
+          document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+          $.ajax({
+            url: '/submit-message',
+            data: $('#message-form').serialize(),
+            type: 'POST',
+            success: function(response) {
+              self.message("");
+              $("#chatbox").scrollTop($("#chatbox").height());
+              console.log("Message uploaded.");
+            },
+            error: function(error) {
+              console.log(error);
+            }
+          });
         }
 
         self.insertNickname = function() {
+          $.ajax({
+            url: '/add-nickname',
+            data: $('#add-name-form').serialize(),
+            type: 'POST',
+            success: function(response) {
+              self.selectedNickname("");
+              self.newNickname("");
+            },
+            error: function(error) {
+              console.log(error);
+            }
+          });
+        }
 
+        self.loadData = function() {
+          $.get("/get-messages")
+          .done(function(data) {
+            console.log(data);
+            $.each(data, function(i, val) {
+              var message = {
+                "id": val[0],
+                "message": val[1],
+                "date": val[2],
+                "author": val[3]
+              };
+
+              self.messages.push(new self.MessageModel(message));
+            });
+          });
+
+          $.get("/get-nicknames")
+          .done(function(data) {
+            console.log(data);
+            $.each(data, function(i, val) {
+              var nickname = {
+                "id": val[0],
+                "author": val[1]
+              };
+              self.nicknames.push(new self.NicknameModel(nickname));
+            });
+          });
         }
 
         self.init = function() {
-
+          self.loadData();
         }
 
         self.init();
@@ -77,37 +150,13 @@
       function insertLine() {
         var rawText = $("#textInput").val();
         var name = $("#nickname-select").val();
-        var userHtml = '<p class="userText"><span><b>' + name + ': </b>' + rawText + '</span></p>';
-        $("#chatbox").append(userHtml);
-        document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
-        $.ajax({
-          url: '/submit-message',
-          data: $('#message-form').serialize(),
-          type: 'POST',
-          success: function(response) {
-            $("#textInput").val("");
-            $("#chatbox").scrollTop($("#chatbox").height());
-          },
-          error: function(error) {
-            console.log(error);
-          }
-        });
+       
       }
 
       function insertNickname(name) {
-        $.ajax({
-          url: '/add-nickname',
-          data: $('#add-name-form').serialize(),
-          type: 'POST',
-          success: function(response) {
-            console.log("Success");
-            $("#nickname-input").val("");
-          },
-          error: function(error) {
-            console.log(error);
-          }
-        });
+        
       }
+
       $(document).ready(function() {
         $("#chatbox").scrollTop($("#chatbox").height());
       });
