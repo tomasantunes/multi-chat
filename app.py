@@ -110,7 +110,7 @@ def submitMessage():
 	return 'OK'
 
 @app.route("/edit-message", methods=['POST'])
-def editMessage2():
+def editMessageRoute():
 	id = request.form['id']
 	message = request.form['message']
 	author = request.form['author']
@@ -119,7 +119,7 @@ def editMessage2():
 	return 'OK'
 
 @app.route("/delete-message", methods=['POST'])
-def deleteMessage2():
+def deleteMessageRoute():
 	id = request.form['id']
 	deleteMessage(id)
 	return 'OK'

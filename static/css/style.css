@@ -1,8 +1,15 @@
+/**********
+GENERAL
+**********/
+
+html {
+    height: 100%;
+}
+
 body {
     font-family: Garamond;
     padding: 2.5%;
     height: 100%;
-    box-sizing: border-box;
 }
 
 h1 {
@@ -20,22 +27,55 @@ h3 {
     text-align: center;
 }
 
+.clearfix {
+    overflow: auto;
+}
+
+/*************
+CHATBOX
+*************/
+
+#app {
+    height: 100%;
+}
+
 #chatbox {
     width: 100%;
     overflow: scroll;
-    height: 300px;
+    height: calc(100% - 250px);
 }
+
+/**********
+ADD NICKNAME
+**********/
 
 #add-name-form {
     position: fixed;
     bottom: 5%;
     left: 2.5%;
     width: 95%;
-    height: 15%;
+    height: 100px;
     padding: 5px;
     border-radius: 5px;
     background-color: #aaa;
 }
+
+#nickname {
+    
+}
+
+#nickname-select {
+    width: 300px;
+    height: 30px;
+}
+
+#add-name {
+    padding: 5px 0px;
+}
+
+/************
+MESSAGE INPUT
+************/
 
 #userInput {
     
@@ -43,9 +83,10 @@ h3 {
 
 #message-form {
     position: fixed;
-    bottom: 22.5%;
+    bottom: 140px;
     left: 2.5%;
     width: 95%;
+    height: 120px;
     padding: 5px;
     border-radius: 5px;
     background-color: #555;
@@ -75,42 +116,8 @@ h3 {
     line-height: 20px;
 }
 
-#nickname {
-    
-}
-
-#nickname-select {
-    width: 300px;
-    height: 30px;
-}
-
-#add-name {
-    padding: 5px 0px;
-}
-
 .userText span {
     background-color: #ccc;
     padding: 10px;
     border-radius: 2px;
-}
-
-.botText {
-    color: white;
-    font-family: monospace;
-    font-size: 17px;
-    text-align: left;
-    line-height: 30px;
-}
-
-.botText span {
-    background-color: #EF5350;
-    padding: 10px;
-    border-radius: 2px;
-}
-
-#tidbit {
-    position:absolute;
-    bottom:0;
-    right:0;
-    width: 300px;
 }
