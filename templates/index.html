@@ -6,21 +6,23 @@
   </head>
   <body>
     <div id="app">
-      <div id="chatbox">
-        <div data-bind="foreach: messages">
-          <p class="userText">
-            <span>
-              <b data-bind="text: author + ': '"></b>
-              <span data-bind="text: message, visible: !editMode()"></span>
-              <input type="text" data-bind="textInput: message, visible: editMode">
-              <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
-              <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
-            </span>
-          </p>
+      <div class="outer">
+        <div id="chatbox">
+          <div data-bind="foreach: messages">
+            <p class="userText">
+              <span>
+                <b data-bind="text: author + ': '"></b>
+                <span data-bind="text: message, visible: !editMode()"></span>
+                <input type="text" data-bind="textInput: message, visible: editMode">
+                <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
+                <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
+              </span>
+            </p>
+          </div>
         </div>
       </div>
       <div>
-        <form id="message-form" class="clearfix" data-bind="submit: insertLine">
+        <form id="message-form" data-bind="submit: insertLine">
           <div id="userInput">
             <input id="textInput" type="text" name="message"  data-bind="textInput: message" placeholder="Message">
             <input id="buttonInput" type="submit" class="btn btn-primary" value="Send">
@@ -36,7 +38,7 @@
             
           </div>
         </form>
-        <form id="add-name-form" data-bind="submit: insertNickname">
+        <form id="nickname-form" data-bind="submit: insertNickname">
           <label for="add-name"><b>Add Nickname</b></label>
           <div id="add-name">
             <input type="text" id="nickname-input" data-bind="textInput: newNickname" name="nickname">
@@ -97,11 +99,21 @@
         self.insertNickname = function() {
           $.ajax({
             url: '/add-nickname',
-            data: $('#add-name-form').serialize(),
+            data: $('#nickname-form').serialize(),
             type: 'POST',
             success: function(response) {
-              self.selectedNickname("");
               self.newNickname("");
+              $.get("/get-nicknames")
+              .done(function(data) {
+                console.log(data);
+                $.each(data, function(i, val) {
+                  var nickname = {
+                    "id": val[0],
+                    "author": val[1]
+                  };
+                  self.nicknames.push(new self.NicknameModel(nickname));
+                });
+              });
             },
             error: function(error) {
               console.log(error);
@@ -114,6 +126,7 @@
           .done(function(data) {
             console.log(data);
             $.each(data, function(i, val) {
+              console.log(data);
               var message = {
                 "id": val[0],
                 "message": val[1],
@@ -140,40 +153,18 @@
 
         self.init = function() {
           self.loadData();
+          $("#chatbox").scrollTop($("#chatbox").height());
         }
 
         self.init();
       }
 
       ko.applyBindings(new AppViewModel(), document.getElementById("app"));
-      
-      function insertLine() {
-        var rawText = $("#textInput").val();
-        var name = $("#nickname-select").val();
-       
-      }
-
-      function insertNickname(name) {
-        
-      }
-
-      $(document).ready(function() {
-        $("#chatbox").scrollTop($("#chatbox").height());
-      });
 
       $("#add").on("click", function () {
         var name = $("#nickname-input").val();
-        $("#nickname-select").append("<option value='" + name + "'>" + name + "</option>");
+        
         insertNickname(name);
-      });
-      
-      $("#textInput").keypress(function(e) {
-          if(e.which == 13) {
-              insertLine();
-          }
-      });
-      $("#buttonInput").click(function() {
-        insertLine();
       });
     </script>
   </body>

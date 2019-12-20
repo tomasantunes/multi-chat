@@ -40,24 +40,30 @@ CHATBOX
 }
 
 #chatbox {
-    width: 100%;
-    overflow: scroll;
-    height: calc(100% - 250px);
+    padding: 25px;
+    overflow: auto;
+}
+
+.outer {
+    overflow: auto;
+    border: 4px solid #91c2e6;
+    border-radius: 25px;
+    height: calc(100% - 260px);
 }
 
 /**********
 ADD NICKNAME
 **********/
 
-#add-name-form {
+#nickname-form {
     position: fixed;
-    bottom: 5%;
+    bottom: 40px;
     left: 2.5%;
     width: 95%;
     height: 100px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #aaa;
+    background-color: #91c2e6;
 }
 
 #nickname {
@@ -77,19 +83,15 @@ ADD NICKNAME
 MESSAGE INPUT
 ************/
 
-#userInput {
-    
-}
-
 #message-form {
     position: fixed;
-    bottom: 140px;
+    bottom: 160px;
     left: 2.5%;
     width: 95%;
     height: 120px;
     padding: 5px;
     border-radius: 5px;
-    background-color: #555;
+    background-color: #4393cc;
 }
 
 #textInput {
@@ -117,7 +119,7 @@ MESSAGE INPUT
 }
 
 .userText span {
-    background-color: #ccc;
+    background-color: #4393cc;
     padding: 10px;
-    border-radius: 2px;
+    border-radius: 10px;
 }
