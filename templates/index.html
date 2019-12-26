@@ -9,14 +9,13 @@
       <div class="outer">
         <div id="chatbox">
           <div data-bind="foreach: messages">
-            <p class="userText">
-              <span>
-                <b data-bind="text: author + ': '"></b>
-                <span data-bind="text: message, visible: !editMode()"></span>
-                <input type="text" data-bind="textInput: message, visible: editMode">
-                <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
-                <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
-              </span>
+            <span class="userText">
+              <b><span data-bind="text: author"></span></b>
+              <span data-bind="text: message, visible: !editMode()"></span>
+              <input type="text" data-bind="textInput: message, visible: editMode">
+              <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
+              <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
+            </span>
             </p>
           </div>
         </div>
@@ -41,7 +40,7 @@
         <form id="nickname-form" data-bind="submit: insertNickname">
           <label for="add-name"><b>Add Nickname</b></label>
           <div id="add-name">
-            <input type="text" id="nickname-input" data-bind="textInput: newNickname" name="nickname">
+            <input type="text" id="nickname-input" data-bind="textInput: newNickname" name="author">
             <button type="submit" class="btn btn-primary"  id="add">Add</button>
           </div>
         </form>
@@ -78,16 +77,17 @@
         }
 
         self.insertLine = function() {
-          var message = {"message": self.message(), "author": self.selectedNickname()}
+          var message = {"message": self.message(), "author": self.selectedNickname().author };
+          var data = "message=" + message.message + "&author=" + message.author;
           self.messages.push(new self.MessageModel(message));
-          document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+          $("#chatbox").scrollTop($("#chatbox").height());
           $.ajax({
             url: '/submit-message',
-            data: $('#message-form').serialize(),
+            data: data,
             type: 'POST',
             success: function(response) {
               self.message("");
-              $("#chatbox").scrollTop($("#chatbox").height());
+              $(".outer").scrollTop($(".outer").height());
               console.log("Message uploaded.");
             },
             error: function(error) {
@@ -105,7 +105,6 @@
               self.newNickname("");
               $.get("/get-nicknames")
               .done(function(data) {
-                console.log(data);
                 $.each(data, function(i, val) {
                   var nickname = {
                     "id": val[0],
@@ -124,23 +123,22 @@
         self.loadData = function() {
           $.get("/get-messages")
           .done(function(data) {
-            console.log(data);
             $.each(data, function(i, val) {
-              console.log(data);
+              console.log(val);
               var message = {
                 "id": val[0],
                 "message": val[1],
                 "date": val[2],
-                "author": val[3]
+                "author": val[3] + ": "
               };
 
               self.messages.push(new self.MessageModel(message));
             });
+            $(".outer").scrollTop($(".outer").height());
           });
 
           $.get("/get-nicknames")
           .done(function(data) {
-            console.log(data);
             $.each(data, function(i, val) {
               var nickname = {
                 "id": val[0],
@@ -153,19 +151,12 @@
 
         self.init = function() {
           self.loadData();
-          $("#chatbox").scrollTop($("#chatbox").height());
         }
 
         self.init();
       }
 
       ko.applyBindings(new AppViewModel(), document.getElementById("app"));
-
-      $("#add").on("click", function () {
-        var name = $("#nickname-input").val();
-        
-        insertNickname(name);
-      });
     </script>
   </body>
 </html>

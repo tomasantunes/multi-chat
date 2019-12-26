@@ -80,12 +80,7 @@ createDB()
 
 @app.route("/")
 def home():
-	cur = get_db().cursor()
-	data1 = cur.execute("select * from messages")
-	messages = cur.fetchall()
-	data2 = cur.execute("select * from nicknames")
-	nicknames = cur.fetchall()
-	return render_template("index.html", messages=messages, nicknames=nicknames)
+	return render_template("index.html")
 
 @app.route("/get-messages")
 def getMessages():
@@ -103,7 +98,8 @@ def getNicknames():
 
 @app.route("/submit-message", methods=['POST'])
 def submitMessage():
-	author = request.form['author']
+	author = request.form.get('author')
+	print(author)
 	message = request.form['message']
 	dt = str(datetime.datetime.now())
 	insertMessage(message, dt, author)
@@ -126,7 +122,8 @@ def deleteMessageRoute():
 
 @app.route("/add-nickname", methods=['POST'])
 def addNickname():
-	nickname = request.form['nickname']
+	nickname = request.form['author']
+	print(nickname)
 	insertNickname(nickname)
 	return 'OK'
 
