@@ -13,8 +13,10 @@
               <b><span data-bind="text: author"></span></b>
               <span data-bind="text: message, visible: !editMode()"></span>
               <input type="text" data-bind="textInput: message, visible: editMode">
-              <button id="edit-btn" data-bind="click: editMessage" class="btn btn-small">Edit</button>
-              <button id="delete-btn" data-bind="click: $root.deleteMessage" class="btn btn-small">Delete</button>
+              <button id="edit-mode-btn" data-bind="click: toggleEditMode" class="btn btn-small"><img class="edit-icon" src="{{ url_for('static', filename='img/edit-64.png') }}"></button>
+              <button id="edit-btn" data-bind="visible: editMode, click: editMessage" class="btn btn-small"><img class="checkmark-icon" src="{{ url_for('static', filename='img/checkmark-64.png') }}"></button>
+              <button id="delete-btn" data-bind="click: deleteMessage" class="btn btn-small"><img class="delete-icon" src="{{ url_for('static', filename='img/delete-64.png') }}"></button><br>
+              <small><span data-bind="text: date"></span></small>
             </span>
             </p>
           </div>
@@ -27,14 +29,12 @@
             <input id="buttonInput" type="submit" class="btn btn-primary" value="Send">
           </div>
         
-        
           <div id="nickname">
-            <label for="nickname-select">Nickname</label>
+            <label for="nickname-select"><b>Nickname</b></label>
             <div class="form-group">
               <select class="form-control form-control-sm" data-bind="options: nicknames, value: selectedNickname, optionsCaption: 'Select name', optionsText: 'author'" name="author" id="nickname-select">
               </select>
             </div>
-            
           </div>
         </form>
         <form id="nickname-form" data-bind="submit: insertNickname">
@@ -62,12 +62,24 @@
 
         self.MessageModel = function(m) {
           var mm = this;
+          mm.id = ko.observable(m.id);
           mm.message = ko.observable(m.message);
           mm.author = ko.observable(m.author);
+          mm.date = ko.observable(m.date);
           mm.editMode = ko.observable(false);
 
           mm.editMessage = function() {
+            $.post("/edit-message", {"id": mm.id(), "message": mm.message(), "author": mm.author()});
+            self.loadData();
+          }
+
+          mm.toggleEditMode = function() {
             mm.editMode(!mm.editMode());
+          }
+
+          mm.deleteMessage = function() {
+            $.post("/delete-message", {"id": mm.id() });
+            self.loadData();
           }
         }
 
@@ -77,6 +89,7 @@
         }
 
         self.insertLine = function() {
+
           var message = {"message": self.message(), "author": self.selectedNickname().author };
           var data = "message=" + message.message + "&author=" + message.author;
           self.messages.push(new self.MessageModel(message));
@@ -89,6 +102,7 @@
               self.message("");
               $(".outer").scrollTop($(".outer").height());
               console.log("Message uploaded.");
+              self.loadData();
             },
             error: function(error) {
               console.log(error);
@@ -110,7 +124,7 @@
                     "id": val[0],
                     "author": val[1]
                   };
-                  self.nicknames.push(new self.NicknameModel(nickname));
+                  self.loadData();
                 });
               });
             },
@@ -121,15 +135,20 @@
         }
 
         self.loadData = function() {
+          self.messages.removeAll();
           $.get("/get-messages")
           .done(function(data) {
             $.each(data, function(i, val) {
-              console.log(val);
+              var id = val[0]
+              var message = val[1]
+              var date1 = val[2].toString();
+              var date2 = date1.substring(0, date1.length - 7);
+              var author = val[3] + ": ";
               var message = {
-                "id": val[0],
-                "message": val[1],
-                "date": val[2],
-                "author": val[3] + ": "
+                "id": id,
+                "message": message,
+                "date": date2,
+                "author": author
               };
 
               self.messages.push(new self.MessageModel(message));
@@ -139,6 +158,7 @@
 
           $.get("/get-nicknames")
           .done(function(data) {
+            self.nicknames.removeAll();
             $.each(data, function(i, val) {
               var nickname = {
                 "id": val[0],
