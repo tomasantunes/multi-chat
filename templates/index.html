@@ -91,7 +91,7 @@
         self.insertLine = function() {
           var message = {"message": self.message(), "author": self.selectedNickname().author };
           var data = "message=" + message.message + "&author=" + message.author;
-          $("#chatbox").scrollTop($("#chatbox").height());
+          $(".outer").scrollTop($("#chatbox").height());
           $.ajax({
             url: '/submit-message',
             data: data,
@@ -151,7 +151,7 @@
               };
               self.messages.push(new self.MessageModel(message));
             });
-            $(".outer").scrollTop($(".outer").height());
+            $(".outer").scrollTop($("#chatbox").height());
           });
 
           $.get("/get-nicknames")
