@@ -6,3 +6,5 @@
 A chat application template with the option of selecting nicknames.
 
 Icons were provided by Iconsdb.com
+
+![Screenshot](https://i.imgur.com/zBMmtNN.png "Screenshot")
