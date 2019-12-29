@@ -89,10 +89,8 @@
         }
 
         self.insertLine = function() {
-
           var message = {"message": self.message(), "author": self.selectedNickname().author };
           var data = "message=" + message.message + "&author=" + message.author;
-          self.messages.push(new self.MessageModel(message));
           $("#chatbox").scrollTop($("#chatbox").height());
           $.ajax({
             url: '/submit-message',
@@ -124,8 +122,8 @@
                     "id": val[0],
                     "author": val[1]
                   };
-                  self.loadData();
                 });
+                self.loadData();
               });
               self.loadData();
             },
@@ -136,9 +134,9 @@
         }
 
         self.loadData = function() {
-          self.messages.removeAll();
           $.get("/get-messages")
           .done(function(data) {
+            self.messages.removeAll();
             $.each(data, function(i, val) {
               var id = val[0]
               var message = val[1]
@@ -151,7 +149,6 @@
                 "date": date2,
                 "author": author
               };
-
               self.messages.push(new self.MessageModel(message));
             });
             $(".outer").scrollTop($(".outer").height());

@@ -61,7 +61,6 @@ def deleteMessage(id):
 def insertNickname(name):
 	try:
 		conn = sqlite3.connect(DATABASE)
-		print(name)
 		nickname = (name,)
 		sql_insert_nickname = """ INSERT INTO nicknames (name) VALUES (?) """
 		cur = conn.cursor()
@@ -99,7 +98,6 @@ def getNicknames():
 @app.route("/submit-message", methods=['POST'])
 def submitMessage():
 	author = request.form.get('author')
-	print(author)
 	message = request.form['message']
 	dt = str(datetime.datetime.now())
 	insertMessage(message, dt, author)
@@ -123,7 +121,6 @@ def deleteMessageRoute():
 @app.route("/add-nickname", methods=['POST'])
 def addNickname():
 	nickname = request.form['author']
-	print(nickname)
 	insertNickname(nickname)
 	return 'OK'
 
