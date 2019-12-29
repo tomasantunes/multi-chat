@@ -50,7 +50,7 @@ def editMessage(id, dt, author, message):
 def deleteMessage(id):
 	try:
 		conn = sqlite3.connect(DATABASE)
-		message = (id)
+		message = (id,)
 		sql_delete_message = """ DELETE FROM messages WHERE id = ? """
 		cur = conn.cursor()
 		cur.execute(sql_delete_message, message)
