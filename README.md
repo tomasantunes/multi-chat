@@ -2,7 +2,7 @@
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y2M1UI)
 
-A chat application template with the option of selecting nicknames.
+A chat application template with the option of selecting multiple nicknames.
 
 Icons were provided by Iconsdb.com
 
